@@ -2,6 +2,7 @@ from django.shortcuts import get_object_or_404, render, redirect
 from blog.models import Post, Category, Comment
 from django.http import Http404
 from datetime import datetime as dati
+import pytz
 
 # ДОБАВЛЕНО в 6-ом спринте.
 from django.contrib.auth import get_user_model
@@ -56,7 +57,7 @@ def post_detail(request, post_id):
                'comments': comments}
     return render(request, 'blog/detail.html', context)
 
-@login_required
+#@login_required
 def category_posts(request, category_slug):
     category = get_object_or_404(Category, slug__exact=category_slug)
     if not category.is_published:
@@ -86,6 +87,9 @@ def create_post(request):
 @login_required
 def edit_post(request, post_id):
     post = get_object_or_404(Post, id=post_id)
+    date = post.pub_date
+    tz_our = pytz.timezone('Europe/Saratov')
+    post.pub_date = date.astimezone(tz_our).strftime('%Y-%m-%dT%H:%M')
     if request.user != post.author:
         return redirect('blog:post_detail', post_id)
     form = CreatePostForm(request.POST or None, instance=post)

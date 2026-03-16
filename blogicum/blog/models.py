@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.utils import timezone
+from datetime import datetime
 
 User = get_user_model()
 
@@ -25,8 +27,10 @@ class Post(BaseModel):
     pub_date = models.DateTimeField(
         verbose_name='Дата и время публикации',
         help_text=('Если установить дату и время в будущем'
-                   ' — можно делать отложенные публикации.')
-    )
+                   ' — можно делать отложенные публикации. Оставить пустым чтобы опубликовать сейчас'),
+
+        blank=True,  
+        null=True)
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -49,6 +53,11 @@ class Post(BaseModel):
         verbose_name='Категория'
     )
     image = models.ImageField('Фото', upload_to='blogicum_images', blank=True)
+
+    def save(self, *args, **kwargs):
+        if not self.pk and not self.pub_date:
+            self.pub_date = datetime.now().strftime('%Y-%m-%dT%H:%M')
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.title
