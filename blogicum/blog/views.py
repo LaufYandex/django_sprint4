@@ -21,7 +21,7 @@ def is_public(query_set):
 def comment_calc(query_set):
     return query_set.annotate(
         comment_count=Count('comments')
-    )
+    ).order_by('-pub_date')
 
 def get_paginator(request, query_set):
     paginator = Paginator(query_set, PAGINATOR_PAGES_COUNT)
@@ -84,7 +84,7 @@ def create_post(request):
         return redirect('blog:profile', username=username)
     return render(request, 'blog/create.html', context)
 
-@login_required
+
 def edit_post(request, post_id):
     post = get_object_or_404(Post, id=post_id)
     date = post.pub_date
@@ -99,7 +99,7 @@ def edit_post(request, post_id):
     context = {'form': form}
     return render(request, 'blog/create.html', context)
 
-@login_required
+
 def delete_post(request, post_id):
     post = get_object_or_404(Post, id=post_id)
     if request.user != post.author:
@@ -122,7 +122,7 @@ def add_comment(request, post_id):
         comment.save()
     return redirect('blog:post_detail', post_id)
 
-@login_required
+
 def edit_comment(request, post_id, comment_id):
     comment = get_object_or_404(Comment, id=comment_id)
     if request.user != comment.author:
@@ -135,7 +135,7 @@ def edit_comment(request, post_id, comment_id):
                'form': form}
     return render(request, 'blog/comment.html', context)
 
-@login_required
+
 def delete_comment(request, post_id, comment_id):
     comment = get_object_or_404(Comment, id=comment_id)
     if request.user != comment.author:
@@ -166,7 +166,7 @@ def profile(request, username):
 
 @login_required
 def edit_profile(request):
-    instance = get_object_or_404(User, username__exact=request.user.username)
+    instance = get_object_or_404(User, username=request.user.username)
     form = UserEditForm(request.POST or None, instance=instance)
 
     context = {

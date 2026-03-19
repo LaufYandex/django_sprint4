@@ -65,6 +65,7 @@ class Post(BaseModel):
     class Meta:
         verbose_name = 'публикация'
         verbose_name_plural = 'Публикации'
+        ordering = ['-pub_date']
 
 
 class Category(BaseModel):
@@ -83,6 +84,7 @@ class Category(BaseModel):
     class Meta:
         verbose_name = 'категория'
         verbose_name_plural = 'Категории'
+        ordering = ['title']
 
 
 class Location(BaseModel):
@@ -94,6 +96,8 @@ class Location(BaseModel):
     class Meta:
         verbose_name = 'местоположение'
         verbose_name_plural = 'Местоположения'
+        ordering = ['name']
+
 
 class Comment(models.Model):
     text = models.TextField('Текст комментария')
